@@ -6,12 +6,19 @@ const MongoClient = require('mongodb').MongoClient
 app.use(bodyParser.urlencoded({extended: true}))
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html')
-  console.log(__dirname)
+  db.collection('quotes').find().toArray((err, result) => {
+    if (err) return console.log(err)
+    res.render('index.ejs', {quotes: result})
+  })
 })
 
 app.post('/quotes', (req, res) => {
-  console.log(req.body)
+  db.collection('quotes').save(req.body, (err, result) => {
+    if (err) return console.log(err)
+
+    console.log('saved to database')
+    res.redirect('/')
+  })
 })
 
 var db
@@ -23,3 +30,5 @@ MongoClient.connect('mongodb://julienthibeaut:lollol12@ds157799.mlab.com:57799/c
     console.log('listening on 3000')
   })
 })
+
+app.set('view engine', 'ejs')
